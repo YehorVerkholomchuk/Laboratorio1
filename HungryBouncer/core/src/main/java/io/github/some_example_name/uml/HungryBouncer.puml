@@ -1,0 +1,448 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+/'Commento'/
+
+interface Common
+
+class MainGame {
+ -menu : Menu
+ -world : World
+ -draw : DrawRenderer
+ -audio : AudioRenderer
+
+ +create() : void
+ +render() : void
+ +dispose() : void
+ -restart() : void
+}
+
+class Menu {
+ -audio : AudioRenderer
+ -save : SaveRenderer
+
+ -tab : String
+ -selectedRect : Rectangle
+
+ -playX : float
+ -setupX : float
+
+ -playerSkinIndex : int
+ -enemySkinIndex : int
+ -backgroundIndex : int
+ -tileIndex : int
+ -foodIndex : int
+ -musicIndex : int
+ -difficultyIndex : int
+ -mapIndex : int
+
+ -isGameOver : boolean
+ -isRestart : boolean
+ -level : int
+
+ +Menu(audio : AudioRenderer)
+
+ +getSelectedRect() : Rectangle
+ +getTab() : String
+ +getPlayX() : float
+ +getSetupX() : float
+ +getPlayerSkinIndex() : int
+ +getEnemySkinIndex() : int
+ +getBackgroundIndex() : int
+ +getTileIndex() : int
+ +getFoodIndex() : int
+ +getMusicIndex() : int
+ +getDifficulty() : String
+ +getMap() : String
+ +getMapName() : String
+ +isGameOver() : boolean
+ +isRestart() : boolean
+ +getLevel() : int
+ +getBestRun() : String[]
+
+ +setGameOver(boolean) : void
+ +setRestart(boolean) : void
+ +setLevel(int) : void
+
+ +update(dr : DrawRenderer, ar : AudioRenderer) : void
+ +play() : void
+ +quit() : void
+
+ -r(float,float,float,float) : Rectangle
+ -inputHome(float,float) : void
+ -inputSetup(float,float,DrawRenderer) : void
+ -inputRecords(float,float) : void
+ -hover(float,float,Rectangle...) : Rectangle
+ -clicked() : boolean
+ -is(Rectangle) : boolean
+}
+
+class SaveRenderer {
+ -PATH : String {static}
+
+ +trySave(food:int, lvl:int, diff:String, time:float) : void
+ +load() : int[]
+ +loadStrings() : String[]
+
+ -val(line:String) : String
+ -parse(line:String) : int
+ -diffToScore(diff:String) : int
+}
+
+class DrawRenderer {
+ -batch : SpriteBatch
+ -shape : ShapeRenderer
+
+ -font : BitmapFont
+ -fontMenu : BitmapFont
+ -fontTitle : BitmapFont
+ -fontOption : BitmapFont
+
+ -menuTex : Texture
+ -hpTex : Texture
+
+ -generics : ArrayList<Texture>
+ -playerSkins : ArrayList<Texture>
+ -enemySkins : ArrayList<Texture>
+ -backgrounds : ArrayList<Texture>
+ -tiles : ArrayList<Texture>
+ -foods : ArrayList<Texture>
+
+ +DrawRenderer()
+
+ +getPlayerSkinCount() : int
+ +getEnemySkinCount() : int
+ +getBackgroundCount() : int
+ +getTileCount() : int
+ +getFoodCount() : int
+
+ +getPlayerSkin(int) : Texture
+ +getEnemySkin(int) : Texture
+ +getBackground(int) : Texture
+ +getTile(int) : Texture
+ +getFood(int) : Texture
+
+ +draw(World, Menu) : void
+ +drawAimLine(Player) : void
+ +drawMenu(Menu, AudioRenderer) : void
+ +drawHome(Menu) : void
+ +drawSetup(Menu, AudioRenderer) : void
+ +drawRecords(Menu) : void
+ +drawGameOver() : void
+
+ +dispose() : void
+}
+
+class AudioRenderer {
+ -random : Random
+ -mainTracks : ArrayList<Music>
+ -mainNames : ArrayList<String>
+
+ -startTimer : float
+ -startDuration : float
+ -gameOverTimer : float
+ -gameOverDuration : float
+
+ +AudioRenderer()
+
+ +getMusicCount() : int
+ +getMusicName(index:int) : String
+
+ +playEat() : void
+ +playHit() : void
+ +playLaunch() : void
+ +playClick() : void
+ +playLevel() : void
+ +playLose() : void
+ +playBounce() : void
+ +playGameOver() : void
+ +playStart() : void
+
+ +playMainMusic(index:int) : void
+ +playMenuMusic() : void
+
+ +stopMusic() : void
+ +stopAll() : void
+
+ +update(dt:float, menu:Menu) : void
+ +dispose() : void
+}
+
+class World {
+ -player : Player
+ -enemy : Enemy
+ -tiles : ArrayList<Tile>
+ -map : int[][]
+
+ -menu : Menu
+ -audio : AudioRenderer
+ -save : SaveRenderer
+ -random : Random
+
+ -enemyTimer : float
+ -timer : float
+ -introTimer : float
+ -gameOverTimer : float
+
+ -levelUp : boolean
+ -foodCount : int
+ -totalFood : int
+
+ +World(menu:Menu, audio:AudioRenderer)
+
+ +getPlayer() : Player
+ +getEnemy() : Enemy
+ +getMap() : int[][]
+ +getIntroTimer() : float
+ +getFoodCount() : int
+
+ +isIntro() : boolean
+ +isGameOverAnim() : boolean
+ +getTime() : int[]
+
+ +create(FileHandle) : void
+ +startIntro() : void
+ +update(float) : void
+
+ -tickEnemy(float) : void
+ -diffTimer() : float
+ -diffDamage() : float
+ -buildTiles() : void
+ -spawnFood() : void
+ -loadMap(FileHandle,String) : int[][]
+}
+
+abstract class Entity {
+ #x : float
+ #y : float
+
+ #width : float
+ #height : float
+
+ #speedX : float
+ #speedY : float
+
+ #dragX : float
+ #dragY : float
+
+ #MIN_SPEED : float
+ #FRICTION : float
+ #MAX_DRAG : float
+ #MAX_FORCE : float
+
+ +drag() : void
+ +launch() : void
+ +move(dt : float) : void
+ +bounce() : void
+ +stop() : void
+ +update(dt : float) : void
+}
+
+class Player {
+ -audio : AudioRenderer
+ -hp : float
+ -food : int
+
+ -isHolding : boolean
+ -hasLaunched : boolean
+
+ -invincibleTimer : float
+ -reloadTimer : float
+ -dragLen : float
+
+ -startX : float
+ -startY : float
+ -endX : float
+ -endY : float
+
+ +Player(audio : AudioRenderer)
+
+ +getHp() : float
+ +getFood() : int
+ +getReloadTimer() : float
+ +isHolding() : boolean
+
+ +getStartX() : float
+ +getStartY() : float
+ +getEndX() : float
+ +getEndY() : float
+
+ +setHp(float) : void
+ +resetFood() : void
+
+ +tryTakeDamage(float) : boolean
+ +hit(String,float,float,float,float) : boolean
+ +hitTiles(ArrayList<Tile>, int[][]) : void
+
+ +getCursorColor() : float[]
+
+ +drag() : void
+ +launch() : void
+ +move(float) : void
+ +bounce() : void
+ +stop() : void
+ +update(float) : void
+}
+
+class Enemy {
+ -hasLaunched : boolean
+ -isLaunching : boolean
+
+ -targetX : float
+ -targetY : float
+
+ -MAX_FORCE : float
+ -FRICTION : float
+
+ +Enemy()
+
+ +applyDifficulty(diff:String) : void
+ +set(tx:float, ty:float, launching:boolean) : void
+ +reset() : void
+
+ +hit(type:String, ox:float, oy:float, ow:float, oh:float) : boolean
+ +hitTiles(tiles:ArrayList<Tile>, map:int[][]) : void
+
+ +drag() : void
+ +launch() : void
+ +move(dt:float) : void
+ +bounce() : void
+ +stop() : void
+ +update(dt:float) : void
+
+ -overlaps(ox:float, oy:float, ow:float, oh:float) : boolean
+}
+
+class Tile {
+ -type : String
+ -x : float
+ -y : float
+ -width : float
+ -height : float
+ -gridX : int
+ -gridY : int
+
+ +Tile(type:String, x:float, y:float, width:float, height:float, gridX:int, gridY:int)
+
+ +getType() : String
+ +getX() : float
+ +getY() : float
+ +getWidth() : float
+ +getHeight() : float
+ +getGridX() : int
+ +getGridY() : int
+}
+
+interface Common {
+    +GREEN : Color
+    +PLAYER_START_X : float
+    +PLAYER_START_Y : float
+    +PLAYER_HP : float
+    +PLAYER_INVINCIBLE_DURATION : float
+    +PLAYER_RELOAD_DURATION : float
+    +ENEMY_START_X : float
+    +ENEMY_START_Y : float
+    +ENEMY_THRESHOLD : float
+    +ENEMY_TIMER_EASY : float
+    +ENEMY_TIMER_NORMAL : float
+    +ENEMY_TIMER_HARD : float
+    +ENEMY_TIMER_EXTREME : float
+    +ENEMY_DAMAGE_EASY : float
+    +ENEMY_DAMAGE_NORMAL : float
+    +ENEMY_DAMAGE_HARD : float
+    +ENEMY_DAMAGE_EXTREME : float
+    +EASY_MULT : float
+    +NORMAL_MULT : float
+    +HARD_MULT : float
+    +EXTREME_MULT : float
+    +WIDTH : int
+    +HEIGHT : int
+    +MAP_WIDTH : int
+    +MAP_HEIGHT : int
+    +TILE_WIDTH : float
+    +TILE_HEIGHT : float
+    +TILE_WALL : int
+    +TILE_FOOD : int
+    +FOOD_HEAL : float
+    +FOOD_BASE : int
+    +FOOD_INCREMENT : int
+    +BUTTON_X : float
+    +BUTTON_WIDTH : float
+    +BUTTON_HEIGHT : float
+    +PLAY_Y : float
+    +SETUP_Y : float
+    +QUIT_Y : float
+    +INTRO_DURATION : float
+    +GAME_OVER_DURATION : float
+    +SETUP_BUTTON_X : float
+    +SETUP_BUTTON_WIDTH : float
+    +SETUP_BUTTON_HEIGHT : float
+    +SETUP_COL2_X : float
+    +SETUP_COL3_X : float
+    +SETUP_PLAYER_Y : float
+    +SETUP_ENEMY_Y : float
+    +SETUP_BG_Y : float
+    +SETUP_TILE_Y : float
+    +SETUP_FOOD_Y : float
+    +SETUP_MUSIC_Y : float
+    +SETUP_DIFF_Y : float
+    +SETUP_MAP_Y : float
+    +SETUP_BACK_Y : float
+    +RECORDS_Y : float
+    +AXIS_LEFT_X : int
+    +AXIS_LEFT_Y : int
+    +BTN_A : int
+    +BTN_B : int
+    +BTN_START : int
+    +STICK_DEADZONE : float
+}
+
+class ControllerInput {
+    +get() : Controller {static}
+    +isConnected() : boolean {static}
+    +axis(axis : int) : float {static}
+    +justPressed(button : int) : boolean {static}
+    +pressed(button : int) : boolean {static}
+}
+
+class ControllerInput + ButtonState {
+    -prev : boolean[] {static}
+    -curr : boolean[] {static}
+    +update() : void {static}
+    +justPressed(button : int) : boolean {static}
+}
+
+Common <|.. Entity
+
+Entity <|-- Player
+Entity <|-- Enemy
+
+MainGame "1" -- "1" Menu
+MainGame "1" -- "1" World
+MainGame "1" -- "1" DrawRenderer
+MainGame "1" -- "1" AudioRenderer
+
+Menu "1" -- "1" AudioRenderer
+Menu "1" *-- "1" SaveRenderer
+
+World "1" -- "1" Menu
+World "1" -- "1" AudioRenderer
+
+World "1" *-- "1" Player
+World "1" *-- "1" Enemy
+World "1" *-- "*" Tile
+World "1" *-- "1" SaveRenderer
+
+Player "1" -- "1" AudioRenderer
+
+Player ..> Tile
+Enemy ..> Tile
+
+DrawRenderer ..> World
+DrawRenderer ..> Menu
+DrawRenderer ..> AudioRenderer
+DrawRenderer ..> Player
+
+AudioRenderer ..> Menu
+
+@enduml
