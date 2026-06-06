@@ -15,6 +15,38 @@ public class Enemy extends Entity implements Common {
     private float MAX_FORCE = 400f;
     private float FRICTION = 16f;
 
+    public float getTargetX() {
+        return targetX;
+    }
+
+    public void setTargetX(float targetX) {
+        this.targetX = targetX;
+    }
+
+    public float getTargetY() {
+        return targetY;
+    }
+
+    public void setTargetY(float targetY) {
+        this.targetY = targetY;
+    }
+
+    public float getMAX_FORCE() {
+        return MAX_FORCE;
+    }
+
+    public void setMAX_FORCE(float MAX_FORCE) {
+        this.MAX_FORCE = MAX_FORCE;
+    }
+
+    public float getFRICTION() {
+        return FRICTION;
+    }
+
+    public void setFRICTION(float FRICTION) {
+        this.FRICTION = FRICTION;
+    }
+
     /**
      * Costruisce un nuovo nemico.
      */

@@ -405,7 +405,7 @@ class ControllerInput {
     +pressed(button : int) : boolean {static}
 }
 
-class ControllerInput + ButtonState {
+class ButtonState {
     -prev : boolean[] {static}
     -curr : boolean[] {static}
     +update() : void {static}
@@ -444,5 +444,7 @@ DrawRenderer ..> AudioRenderer
 DrawRenderer ..> Player
 
 AudioRenderer ..> Menu
+
+ControllerInput *-- "1" ButtonState
 
 @enduml

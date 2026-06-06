@@ -17,6 +17,22 @@ public abstract class Entity implements Common {
     final float MAX_DRAG = 600f;
     final float MAX_FORCE = 400f;
 
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
     /**
      * Gestisce il trascinamento dell'entità.
      */
